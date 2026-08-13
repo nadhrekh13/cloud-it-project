@@ -59,7 +59,12 @@ app.post('/api/bookings', (req, res) => {
   });
 });
 
-// 5. GET booking by ID
+// 5. GET all bookings (NEW)
+app.get('/api/bookings', (req, res) => {
+  res.json(bookings);
+});
+
+// 6. GET booking by ID
 app.get('/api/bookings/:id', (req, res) => {
   const booking = bookings.find((b) => b.bookingId === req.params.id);
   if (!booking) {
