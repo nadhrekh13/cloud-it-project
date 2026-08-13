@@ -54,30 +54,45 @@ function App() {
     setIsSubmitting(true);
     setBookingStatus(null);
 
+    const movieId = selectedMovie._id || selectedMovie.id;
+    const ticketPrice = Number(selectedMovie.price) || 11;
+    const numSeats = Number(seats);
+
+    // Multi-field payload to match backend schema requirements
     const bookingPayload = {
-      movieId: selectedMovie._id || selectedMovie.id,
+      // Movie identifiers
+      movieId: movieId,
+      movie: movieId,
       movieTitle: selectedMovie.title,
-      seats: Number(seats),
+      
+      // User identifiers
       customerName: customerName.trim() || 'Anonymous',
-      totalPrice: (Number(selectedMovie.price) || 12) * Number(seats)
+      name: customerName.trim() || 'Anonymous',
+      user: customerName.trim() || 'Anonymous',
+
+      // Seat & Price details
+      seats: numSeats,
+      tickets: numSeats,
+      totalPrice: ticketPrice * numSeats,
+      price: ticketPrice * numSeats
     };
 
     try {
       const response = await axios.post(`${API_BASE_URL}/bookings`, bookingPayload);
       setBookingStatus({
         type: 'success',
-        message: `Booking successful! Ticket ID: ${response.data._id || response.data.id || 'CONFIRMED'}`
+        message: `Booking successful! ID: ${response.data._id || response.data.id || 'CONFIRMED'}`
       });
       
-      // Auto close modal after 2.5 seconds on success
       setTimeout(() => {
         handleCloseBooking();
       }, 2500);
     } catch (err) {
       console.error('Error creating booking:', err);
+      const serverMessage = err.response?.data?.message || err.response?.data?.error;
       setBookingStatus({
         type: 'error',
-        message: err.response?.data?.message || 'Failed to complete booking. Please try again.'
+        message: serverMessage || 'Failed to complete booking. Please check backend server.'
       });
     } finally {
       setIsSubmitting(false);
@@ -111,7 +126,7 @@ function App() {
       <main style={styles.grid}>
         {movies.map((movie) => {
           // Fallback if price field is missing in database record
-          const moviePrice = movie.price ?? movie.ticketPrice ?? 12.00;
+          const moviePrice = movie.price ?? movie.ticketPrice ?? 11.00;
           const movieId = movie._id || movie.id;
 
           return (
@@ -211,7 +226,7 @@ function App() {
   );
 }
 
-// Inline CSS styles to guarantee clean UI rendering
+// Inline CSS styles
 const styles = {
   app: {
     backgroundColor: '#121212',
@@ -294,6 +309,15 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     fontFamily: 'Segoe UI, sans-serif'
+  },
+  button: {
+    backgroundColor: '#3498db',
+    color: '#fff',
+    border: 'none',
+    padding: '10px 20px',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    marginTop: '15px'
   },
   modalOverlay: {
     position: 'fixed',
