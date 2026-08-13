@@ -54,59 +54,40 @@ function App() {
     setIsSubmitting(true);
     setBookingStatus(null);
 
-    const mId = String(selectedMovie._id || selectedMovie.id || '');
-    const mTitle = selectedMovie.title || 'Movie';
-    const cName = customerName.trim() || 'Guest';
     const numSeats = Number(seats);
     const ticketPrice = Number(selectedMovie.price) || 11;
-    const totalAmount = ticketPrice * numSeats;
+    const computedTotal = ticketPrice * numSeats;
+    const cName = customerName.trim() || 'John Doe';
+    
+    // Generate seat array to satisfy backend seats.length check
+    const seatArray = Array.from({ length: numSeats }, (_, i) => `Seat ${i + 1}`);
 
-    // Multi-field payload designed to satisfy all standard Express/Mongoose booking schemas
     const bookingPayload = {
-      // Movie fields
-      movieId: mId,
-      movie: mId,
-      movieTitle: mTitle,
-      title: mTitle,
-
-      // Customer fields
+      movieId: String(selectedMovie._id || selectedMovie.id),
+      movieTitle: selectedMovie.title,
       customerName: cName,
-      name: cName,
-      user: cName,
-      userName: cName,
-      email: `${cName.toLowerCase().replace(/\s+/g, '')}@example.com`,
-
-      // Seat & pricing fields
-      seats: numSeats,
-      tickets: numSeats,
-      quantity: numSeats,
-      totalPrice: totalAmount,
-      price: totalAmount,
-
-      // Date / Time fallbacks
+      customerEmail: `${cName.toLowerCase().replace(/\s+/g, '')}@example.com`,
       showtime: '20:00',
-      time: '20:00',
-      date: new Date().toISOString().split('T')[0]
+      seats: seatArray,
+      totalAmount: computedTotal
     };
 
     try {
       const response = await axios.post(`${API_BASE_URL}/bookings`, bookingPayload);
-      
       setBookingStatus({
         type: 'success',
-        message: `Booking successful! ID: ${response.data._id || response.data.id || response.data.bookingId || 'CONFIRMED'}`
+        message: `Booking successful! ID: ${response.data._id || response.data.id || 'CONFIRMED'}`
       });
       
-      // Auto close modal after 2.5 seconds on success
       setTimeout(() => {
         handleCloseBooking();
       }, 2500);
     } catch (err) {
       console.error('Error creating booking:', err);
-      const serverError = err.response?.data?.error || err.response?.data?.message;
+      const serverMessage = err.response?.data?.error || err.response?.data?.message;
       setBookingStatus({
         type: 'error',
-        message: serverError || 'Failed to complete booking. Check backend console.'
+        message: serverMessage || 'Failed to complete booking.'
       });
     } finally {
       setIsSubmitting(false);
