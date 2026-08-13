@@ -54,34 +54,45 @@ function App() {
     setIsSubmitting(true);
     setBookingStatus(null);
 
-    const movieId = selectedMovie._id || selectedMovie.id;
-    const ticketPrice = Number(selectedMovie.price) || 11;
+    const mId = String(selectedMovie._id || selectedMovie.id);
+    const mTitle = selectedMovie.title || 'Movie';
+    const cName = customerName.trim() || 'John Doe';
     const numSeats = Number(seats);
+    const pricePerTicket = Number(selectedMovie.price) || 11;
+    const calculatedTotal = pricePerTicket * numSeats;
 
-    // Multi-field payload to match backend schema requirements
+    // Comprehensive payload satisfying all standard Node/Express validations
     const bookingPayload = {
       // Movie identifiers
-      movieId: movieId,
-      movie: movieId,
-      movieTitle: selectedMovie.title,
-      
-      // User identifiers
-      customerName: customerName.trim() || 'Anonymous',
-      name: customerName.trim() || 'Anonymous',
-      user: customerName.trim() || 'Anonymous',
+      movieId: mId,
+      movie: mId,
+      movieTitle: mTitle,
 
-      // Seat & Price details
+      // Customer identifiers
+      customerName: cName,
+      name: cName,
+      user: cName,
+      userName: cName,
+      email: `${cName.toLowerCase().replace(/\s+/g, '')}@example.com`,
+
+      // Seat and calculation fields
       seats: numSeats,
       tickets: numSeats,
-      totalPrice: ticketPrice * numSeats,
-      price: ticketPrice * numSeats
+      quantity: numSeats,
+      totalPrice: calculatedTotal,
+      price: calculatedTotal,
+
+      // Date / Time fallbacks
+      showtime: '20:00',
+      time: '20:00',
+      date: new Date().toISOString().split('T')[0]
     };
 
     try {
       const response = await axios.post(`${API_BASE_URL}/bookings`, bookingPayload);
       setBookingStatus({
         type: 'success',
-        message: `Booking successful! ID: ${response.data._id || response.data.id || 'CONFIRMED'}`
+        message: `Booking successful! ID: ${response.data._id || response.data.id || response.data.bookingId || 'CONFIRMED'}`
       });
       
       setTimeout(() => {
@@ -89,10 +100,10 @@ function App() {
       }, 2500);
     } catch (err) {
       console.error('Error creating booking:', err);
-      const serverMessage = err.response?.data?.message || err.response?.data?.error;
+      const serverMessage = err.response?.data?.error || err.response?.data?.message;
       setBookingStatus({
         type: 'error',
-        message: serverMessage || 'Failed to complete booking. Please check backend server.'
+        message: serverMessage || 'Failed to complete booking.'
       });
     } finally {
       setIsSubmitting(false);
