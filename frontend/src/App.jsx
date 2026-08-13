@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://<1.103.15.186:5000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://51.103.15.186:5000";
 
 function App() {
   const [movies, setMovies] = useState([]);
