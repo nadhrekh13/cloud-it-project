@@ -12,7 +12,7 @@ export default function Checkout({ booking }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/bookings', {
+      const response = await axios.post('http://51.103.15.186:5000/api/bookings', {
         movieId: booking.movie.id,
         movieTitle: booking.movie.title,
         customerName: name,

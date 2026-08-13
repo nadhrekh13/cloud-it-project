@@ -6,7 +6,7 @@ export default function Home() {
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/movies')
+    axios.get('http://http://51.103.15.186:5000/api/movies')
       .then(res => setMovies(res.data))
       .catch(err => console.error(err));
   }, []);

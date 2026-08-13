@@ -9,7 +9,7 @@ export default function MovieDetails({ setBooking }) {
   const [selectedShowtime, setSelectedShowtime] = useState('');
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/movies/${id}`)
+    axios.get(`http://http://51.103.15.186:5000/api/movies/${id}`)
       .then(res => setMovie(res.data))
       .catch(err => console.error(err));
   }, [id]);

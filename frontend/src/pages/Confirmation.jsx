@@ -7,7 +7,7 @@ export default function Confirmation() {
   const [booking, setBooking] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/bookings/${bookingId}`)
+    axios.get(`http://51.103.15.186:5000/api/bookings/${bookingId}`)
       .then(res => setBooking(res.data))
       .catch(err => console.error(err));
   }, [bookingId]);
