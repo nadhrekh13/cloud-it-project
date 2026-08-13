@@ -54,33 +54,34 @@ function App() {
     setIsSubmitting(true);
     setBookingStatus(null);
 
-    const mId = String(selectedMovie._id || selectedMovie.id);
+    const mId = String(selectedMovie._id || selectedMovie.id || '');
     const mTitle = selectedMovie.title || 'Movie';
-    const cName = customerName.trim() || 'John Doe';
+    const cName = customerName.trim() || 'Guest';
     const numSeats = Number(seats);
-    const pricePerTicket = Number(selectedMovie.price) || 11;
-    const calculatedTotal = pricePerTicket * numSeats;
+    const ticketPrice = Number(selectedMovie.price) || 11;
+    const totalAmount = ticketPrice * numSeats;
 
-    // Comprehensive payload satisfying all standard Node/Express validations
+    // Multi-field payload designed to satisfy all standard Express/Mongoose booking schemas
     const bookingPayload = {
-      // Movie identifiers
+      // Movie fields
       movieId: mId,
       movie: mId,
       movieTitle: mTitle,
+      title: mTitle,
 
-      // Customer identifiers
+      // Customer fields
       customerName: cName,
       name: cName,
       user: cName,
       userName: cName,
       email: `${cName.toLowerCase().replace(/\s+/g, '')}@example.com`,
 
-      // Seat and calculation fields
+      // Seat & pricing fields
       seats: numSeats,
       tickets: numSeats,
       quantity: numSeats,
-      totalPrice: calculatedTotal,
-      price: calculatedTotal,
+      totalPrice: totalAmount,
+      price: totalAmount,
 
       // Date / Time fallbacks
       showtime: '20:00',
@@ -90,20 +91,22 @@ function App() {
 
     try {
       const response = await axios.post(`${API_BASE_URL}/bookings`, bookingPayload);
+      
       setBookingStatus({
         type: 'success',
         message: `Booking successful! ID: ${response.data._id || response.data.id || response.data.bookingId || 'CONFIRMED'}`
       });
       
+      // Auto close modal after 2.5 seconds on success
       setTimeout(() => {
         handleCloseBooking();
       }, 2500);
     } catch (err) {
       console.error('Error creating booking:', err);
-      const serverMessage = err.response?.data?.error || err.response?.data?.message;
+      const serverError = err.response?.data?.error || err.response?.data?.message;
       setBookingStatus({
         type: 'error',
-        message: serverMessage || 'Failed to complete booking.'
+        message: serverError || 'Failed to complete booking. Check backend console.'
       });
     } finally {
       setIsSubmitting(false);
@@ -136,7 +139,6 @@ function App() {
 
       <main style={styles.grid}>
         {movies.map((movie) => {
-          // Fallback if price field is missing in database record
           const moviePrice = movie.price ?? movie.ticketPrice ?? 11.00;
           const movieId = movie._id || movie.id;
 
@@ -237,7 +239,7 @@ function App() {
   );
 }
 
-// Inline CSS styles
+// Inline Styling Object
 const styles = {
   app: {
     backgroundColor: '#121212',
